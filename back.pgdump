@@ -5,7 +5,7 @@
 -- Dumped from database version 14.4
 -- Dumped by pg_dump version 14.4
 
--- Started on 2022-10-25 22:22:35
+-- Started on 2022-10-25 22:27:20
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -467,20 +467,32 @@ $$;
 ALTER FUNCTION public.get_fact_docs() OWNER TO postgres;
 
 --
--- TOC entry 265 (class 1255 OID 25733)
+-- TOC entry 265 (class 1255 OID 25753)
 -- Name: get_fact_docs_by_worker(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
 CREATE FUNCTION public.get_fact_docs_by_worker(workerid integer) RETURNS TABLE(id integer, "workerId" integer, "fullName" text, job integer, "jobTitle" text, "docType" integer, "docTypeTitle" text, "linkToFile" text, "dateToPass" date, "dateOfPass" date, "isRelevant" boolean)
     LANGUAGE plpgsql
     AS $$
+declare 
+	idExist int;
 begin
+
+	select count (*)
+	from fact_docs
+	where workerId = fact_docs."worker"
+	into idExist;
+	
+	if idExist = 0 then
+		raise exception 'Для данного пользователя нет назначенных документов';
+	end if;
+
 	drop table if exists temp1;
-	create table temp1 as
+	create temp table temp1 as
 		select * from fact_docs;
 
 	drop table if exists temp2;
-	create table temp2 as
+	create temp table temp2 as
 	select
 		fact_docs."id",
 		fact_docs."worker",
@@ -498,7 +510,7 @@ begin
 	on fact_docs."reason" = schedule."id";
 
 	drop table if exists temp3;
-	create table temp3 as
+	create temp table temp3 as
 	select
 		temp2."id",
 		temp2."worker",
@@ -1097,66 +1109,6 @@ ALTER TABLE public.schedule ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 229 (class 1259 OID 25734)
--- Name: temp1; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.temp1 (
-    id integer,
-    worker integer,
-    reason integer,
-    "linkToFile" text,
-    "dateToPass" date,
-    "dateOfPass" date,
-    "isRelevant" boolean
-);
-
-
-ALTER TABLE public.temp1 OWNER TO postgres;
-
---
--- TOC entry 230 (class 1259 OID 25739)
--- Name: temp2; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.temp2 (
-    id integer,
-    worker integer,
-    "fullName" text,
-    job integer,
-    "docType" integer,
-    "linkToFile" text,
-    "dateToPass" date,
-    "dateOfPass" date,
-    "isRelevant" boolean
-);
-
-
-ALTER TABLE public.temp2 OWNER TO postgres;
-
---
--- TOC entry 231 (class 1259 OID 25744)
--- Name: temp3; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.temp3 (
-    id integer,
-    worker integer,
-    "fullName" text,
-    job integer,
-    "jobTitle" text,
-    "docType" integer,
-    doctypetitle text,
-    "linkToFile" text,
-    "dateToPass" date,
-    "dateOfPass" date,
-    "isRelevant" boolean
-);
-
-
-ALTER TABLE public.temp3 OWNER TO postgres;
-
---
 -- TOC entry 222 (class 1259 OID 16432)
 -- Name: workers; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -1187,7 +1139,7 @@ ALTER TABLE public.workers ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 3399 (class 0 OID 16412)
+-- TOC entry 3396 (class 0 OID 16412)
 -- Dependencies: 218
 -- Data for Name: doc_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1213,7 +1165,7 @@ COPY public.doc_types (id, title, "linkToShablon") FROM stdin;
 
 
 --
--- TOC entry 3407 (class 0 OID 16471)
+-- TOC entry 3404 (class 0 OID 16471)
 -- Dependencies: 226
 -- Data for Name: fact_docs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1376,7 +1328,7 @@ COPY public.fact_docs (id, worker, reason, "linkToFile", "dateToPass", "dateOfPa
 
 
 --
--- TOC entry 3400 (class 0 OID 16419)
+-- TOC entry 3397 (class 0 OID 16419)
 -- Dependencies: 219
 -- Data for Name: jobs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1395,7 +1347,7 @@ COPY public.jobs (id, title) FROM stdin;
 
 
 --
--- TOC entry 3409 (class 0 OID 16567)
+-- TOC entry 3406 (class 0 OID 16567)
 -- Dependencies: 228
 -- Data for Name: periodicity; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1411,7 +1363,7 @@ COPY public.periodicity (id, title, dates) FROM stdin;
 
 
 --
--- TOC entry 3405 (class 0 OID 16445)
+-- TOC entry 3402 (class 0 OID 16445)
 -- Dependencies: 224
 -- Data for Name: schedule; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1424,343 +1376,7 @@ COPY public.schedule (id, "docType", "jobOfResponsible", period) FROM stdin;
 
 
 --
--- TOC entry 3410 (class 0 OID 25734)
--- Dependencies: 229
--- Data for Name: temp1; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.temp1 (id, worker, reason, "linkToFile", "dateToPass", "dateOfPass", "isRelevant") FROM stdin;
-82	1	39	\N	2022-10-27	\N	t
-83	1	39	\N	2022-12-22	\N	t
-84	1	39	\N	2023-03-23	\N	t
-85	1	39	\N	2023-05-31	\N	t
-86	2	39	\N	2022-10-27	\N	t
-87	2	39	\N	2022-12-22	\N	t
-88	2	39	\N	2023-03-23	\N	t
-89	2	39	\N	2023-05-31	\N	t
-90	3	39	\N	2022-10-27	\N	t
-91	3	39	\N	2022-12-22	\N	t
-92	3	39	\N	2023-03-23	\N	t
-93	3	39	\N	2023-05-31	\N	t
-94	4	39	\N	2022-10-27	\N	t
-95	4	39	\N	2022-12-22	\N	t
-96	4	39	\N	2023-03-23	\N	t
-97	4	39	\N	2023-05-31	\N	t
-98	5	39	\N	2022-10-27	\N	t
-99	5	39	\N	2022-12-22	\N	t
-100	5	39	\N	2023-03-23	\N	t
-101	5	39	\N	2023-05-31	\N	t
-102	6	39	\N	2022-10-27	\N	t
-103	6	39	\N	2022-12-22	\N	t
-104	6	39	\N	2023-03-23	\N	t
-105	6	39	\N	2023-05-31	\N	t
-106	7	39	\N	2022-10-27	\N	t
-107	7	39	\N	2022-12-22	\N	t
-108	7	39	\N	2023-03-23	\N	t
-109	7	39	\N	2023-05-31	\N	t
-110	8	39	\N	2022-10-27	\N	t
-111	8	39	\N	2022-12-22	\N	t
-112	8	39	\N	2023-03-23	\N	t
-113	8	39	\N	2023-05-31	\N	t
-114	9	39	\N	2022-10-27	\N	t
-115	9	39	\N	2022-12-22	\N	t
-116	9	39	\N	2023-03-23	\N	t
-117	9	39	\N	2023-05-31	\N	t
-118	1	40	\N	2022-10-27	\N	t
-119	1	40	\N	2022-12-22	\N	t
-120	1	40	\N	2023-03-23	\N	t
-121	1	40	\N	2023-05-31	\N	t
-122	2	40	\N	2022-10-27	\N	t
-123	2	40	\N	2022-12-22	\N	t
-124	2	40	\N	2023-03-23	\N	t
-125	2	40	\N	2023-05-31	\N	t
-126	3	40	\N	2022-10-27	\N	t
-127	3	40	\N	2022-12-22	\N	t
-128	3	40	\N	2023-03-23	\N	t
-129	3	40	\N	2023-05-31	\N	t
-130	4	40	\N	2022-10-27	\N	t
-131	4	40	\N	2022-12-22	\N	t
-132	4	40	\N	2023-03-23	\N	t
-133	4	40	\N	2023-05-31	\N	t
-134	5	40	\N	2022-10-27	\N	t
-135	5	40	\N	2022-12-22	\N	t
-136	5	40	\N	2023-03-23	\N	t
-137	5	40	\N	2023-05-31	\N	t
-138	6	40	\N	2022-10-27	\N	t
-139	6	40	\N	2022-12-22	\N	t
-140	6	40	\N	2023-03-23	\N	t
-141	6	40	\N	2023-05-31	\N	t
-142	7	40	\N	2022-10-27	\N	t
-143	7	40	\N	2022-12-22	\N	t
-144	7	40	\N	2023-03-23	\N	t
-145	7	40	\N	2023-05-31	\N	t
-146	8	40	\N	2022-10-27	\N	t
-147	8	40	\N	2022-12-22	\N	t
-148	8	40	\N	2023-03-23	\N	t
-149	8	40	\N	2023-05-31	\N	t
-150	9	40	\N	2022-10-27	\N	t
-151	9	40	\N	2022-12-22	\N	t
-152	9	40	\N	2023-03-23	\N	t
-153	9	40	\N	2023-05-31	\N	t
-154	1	41	\N	2022-09-30	\N	t
-155	1	41	\N	2022-10-31	\N	t
-156	1	41	\N	2022-11-30	\N	t
-157	1	41	\N	2022-12-31	\N	t
-158	1	41	\N	2023-01-31	\N	t
-159	1	41	\N	2023-02-28	\N	t
-160	1	41	\N	2023-03-31	\N	t
-161	1	41	\N	2023-04-30	\N	t
-162	1	41	\N	2023-05-31	\N	t
-163	2	41	\N	2022-09-30	\N	t
-164	2	41	\N	2022-10-31	\N	t
-165	2	41	\N	2022-11-30	\N	t
-166	2	41	\N	2022-12-31	\N	t
-167	2	41	\N	2023-01-31	\N	t
-168	2	41	\N	2023-02-28	\N	t
-169	2	41	\N	2023-03-31	\N	t
-170	2	41	\N	2023-04-30	\N	t
-171	2	41	\N	2023-05-31	\N	t
-172	3	41	\N	2022-09-30	\N	t
-173	3	41	\N	2022-10-31	\N	t
-174	3	41	\N	2022-11-30	\N	t
-175	3	41	\N	2022-12-31	\N	t
-176	3	41	\N	2023-01-31	\N	t
-177	3	41	\N	2023-02-28	\N	t
-178	3	41	\N	2023-03-31	\N	t
-179	3	41	\N	2023-04-30	\N	t
-180	3	41	\N	2023-05-31	\N	t
-181	4	41	\N	2022-09-30	\N	t
-182	4	41	\N	2022-10-31	\N	t
-183	4	41	\N	2022-11-30	\N	t
-184	4	41	\N	2022-12-31	\N	t
-185	4	41	\N	2023-01-31	\N	t
-186	4	41	\N	2023-02-28	\N	t
-187	4	41	\N	2023-03-31	\N	t
-188	4	41	\N	2023-04-30	\N	t
-189	4	41	\N	2023-05-31	\N	t
-190	5	41	\N	2022-09-30	\N	t
-191	5	41	\N	2022-10-31	\N	t
-192	5	41	\N	2022-11-30	\N	t
-193	5	41	\N	2022-12-31	\N	t
-194	5	41	\N	2023-01-31	\N	t
-195	5	41	\N	2023-02-28	\N	t
-196	5	41	\N	2023-03-31	\N	t
-197	5	41	\N	2023-04-30	\N	t
-198	5	41	\N	2023-05-31	\N	t
-199	6	41	\N	2022-09-30	\N	t
-200	6	41	\N	2022-10-31	\N	t
-201	6	41	\N	2022-11-30	\N	t
-202	6	41	\N	2022-12-31	\N	t
-203	6	41	\N	2023-01-31	\N	t
-204	6	41	\N	2023-02-28	\N	t
-205	6	41	\N	2023-03-31	\N	t
-206	6	41	\N	2023-04-30	\N	t
-207	6	41	\N	2023-05-31	\N	t
-208	7	41	\N	2022-09-30	\N	t
-209	7	41	\N	2022-10-31	\N	t
-210	7	41	\N	2022-11-30	\N	t
-211	7	41	\N	2022-12-31	\N	t
-212	7	41	\N	2023-01-31	\N	t
-213	7	41	\N	2023-02-28	\N	t
-214	7	41	\N	2023-03-31	\N	t
-215	7	41	\N	2023-04-30	\N	t
-216	7	41	\N	2023-05-31	\N	t
-217	8	41	\N	2022-09-30	\N	t
-218	8	41	\N	2022-10-31	\N	t
-219	8	41	\N	2022-11-30	\N	t
-220	8	41	\N	2022-12-31	\N	t
-221	8	41	\N	2023-01-31	\N	t
-222	8	41	\N	2023-02-28	\N	t
-223	8	41	\N	2023-03-31	\N	t
-224	8	41	\N	2023-04-30	\N	t
-225	8	41	\N	2023-05-31	\N	t
-226	9	41	\N	2022-09-30	\N	t
-227	9	41	\N	2022-10-31	\N	t
-228	9	41	\N	2022-11-30	\N	t
-229	9	41	\N	2022-12-31	\N	t
-230	9	41	\N	2023-01-31	\N	t
-231	9	41	\N	2023-02-28	\N	t
-232	9	41	\N	2023-03-31	\N	t
-233	9	41	\N	2023-04-30	\N	t
-234	9	41	\N	2023-05-31	\N	t
-\.
-
-
---
--- TOC entry 3411 (class 0 OID 25739)
--- Dependencies: 230
--- Data for Name: temp2; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.temp2 (id, worker, "fullName", job, "docType", "linkToFile", "dateToPass", "dateOfPass", "isRelevant") FROM stdin;
-82	1	Новикова Анастасия Павловна	1	1	\N	2022-10-27	\N	t
-83	1	Новикова Анастасия Павловна	1	1	\N	2022-12-22	\N	t
-84	1	Новикова Анастасия Павловна	1	1	\N	2023-03-23	\N	t
-85	1	Новикова Анастасия Павловна	1	1	\N	2023-05-31	\N	t
-86	2	Смирнов Александр Александрович	1	1	\N	2022-10-27	\N	t
-87	2	Смирнов Александр Александрович	1	1	\N	2022-12-22	\N	t
-88	2	Смирнов Александр Александрович	1	1	\N	2023-03-23	\N	t
-89	2	Смирнов Александр Александрович	1	1	\N	2023-05-31	\N	t
-90	3	Федотова Евгения Сергеевна	1	1	\N	2022-10-27	\N	t
-91	3	Федотова Евгения Сергеевна	1	1	\N	2022-12-22	\N	t
-92	3	Федотова Евгения Сергеевна	1	1	\N	2023-03-23	\N	t
-93	3	Федотова Евгения Сергеевна	1	1	\N	2023-05-31	\N	t
-94	4	Евсеева Татьяна Ивановна	1	1	\N	2022-10-27	\N	t
-95	4	Евсеева Татьяна Ивановна	1	1	\N	2022-12-22	\N	t
-96	4	Евсеева Татьяна Ивановна	1	1	\N	2023-03-23	\N	t
-97	4	Евсеева Татьяна Ивановна	1	1	\N	2023-05-31	\N	t
-98	5	Мещерякова Мария Владимировна	1	1	\N	2022-10-27	\N	t
-99	5	Мещерякова Мария Владимировна	1	1	\N	2022-12-22	\N	t
-100	5	Мещерякова Мария Владимировна	1	1	\N	2023-03-23	\N	t
-101	5	Мещерякова Мария Владимировна	1	1	\N	2023-05-31	\N	t
-102	6	Герасимова Юлия Артемьевна	1	1	\N	2022-10-27	\N	t
-103	6	Герасимова Юлия Артемьевна	1	1	\N	2022-12-22	\N	t
-104	6	Герасимова Юлия Артемьевна	1	1	\N	2023-03-23	\N	t
-105	6	Герасимова Юлия Артемьевна	1	1	\N	2023-05-31	\N	t
-106	7	Прохоров Иван Павлович	1	1	\N	2022-10-27	\N	t
-107	7	Прохоров Иван Павлович	1	1	\N	2022-12-22	\N	t
-108	7	Прохоров Иван Павлович	1	1	\N	2023-03-23	\N	t
-109	7	Прохоров Иван Павлович	1	1	\N	2023-05-31	\N	t
-110	8	Терехова Алиса Владимировна	1	1	\N	2022-10-27	\N	t
-111	8	Терехова Алиса Владимировна	1	1	\N	2022-12-22	\N	t
-112	8	Терехова Алиса Владимировна	1	1	\N	2023-03-23	\N	t
-113	8	Терехова Алиса Владимировна	1	1	\N	2023-05-31	\N	t
-114	9	Воробьева Виктория Максимовна	1	1	\N	2022-10-27	\N	t
-115	9	Воробьева Виктория Максимовна	1	1	\N	2022-12-22	\N	t
-116	9	Воробьева Виктория Максимовна	1	1	\N	2023-03-23	\N	t
-117	9	Воробьева Виктория Максимовна	1	1	\N	2023-05-31	\N	t
-118	1	Новикова Анастасия Павловна	1	2	\N	2022-10-27	\N	t
-119	1	Новикова Анастасия Павловна	1	2	\N	2022-12-22	\N	t
-120	1	Новикова Анастасия Павловна	1	2	\N	2023-03-23	\N	t
-121	1	Новикова Анастасия Павловна	1	2	\N	2023-05-31	\N	t
-122	2	Смирнов Александр Александрович	1	2	\N	2022-10-27	\N	t
-123	2	Смирнов Александр Александрович	1	2	\N	2022-12-22	\N	t
-124	2	Смирнов Александр Александрович	1	2	\N	2023-03-23	\N	t
-125	2	Смирнов Александр Александрович	1	2	\N	2023-05-31	\N	t
-126	3	Федотова Евгения Сергеевна	1	2	\N	2022-10-27	\N	t
-127	3	Федотова Евгения Сергеевна	1	2	\N	2022-12-22	\N	t
-128	3	Федотова Евгения Сергеевна	1	2	\N	2023-03-23	\N	t
-129	3	Федотова Евгения Сергеевна	1	2	\N	2023-05-31	\N	t
-130	4	Евсеева Татьяна Ивановна	1	2	\N	2022-10-27	\N	t
-131	4	Евсеева Татьяна Ивановна	1	2	\N	2022-12-22	\N	t
-132	4	Евсеева Татьяна Ивановна	1	2	\N	2023-03-23	\N	t
-133	4	Евсеева Татьяна Ивановна	1	2	\N	2023-05-31	\N	t
-134	5	Мещерякова Мария Владимировна	1	2	\N	2022-10-27	\N	t
-135	5	Мещерякова Мария Владимировна	1	2	\N	2022-12-22	\N	t
-136	5	Мещерякова Мария Владимировна	1	2	\N	2023-03-23	\N	t
-137	5	Мещерякова Мария Владимировна	1	2	\N	2023-05-31	\N	t
-138	6	Герасимова Юлия Артемьевна	1	2	\N	2022-10-27	\N	t
-139	6	Герасимова Юлия Артемьевна	1	2	\N	2022-12-22	\N	t
-140	6	Герасимова Юлия Артемьевна	1	2	\N	2023-03-23	\N	t
-141	6	Герасимова Юлия Артемьевна	1	2	\N	2023-05-31	\N	t
-142	7	Прохоров Иван Павлович	1	2	\N	2022-10-27	\N	t
-143	7	Прохоров Иван Павлович	1	2	\N	2022-12-22	\N	t
-144	7	Прохоров Иван Павлович	1	2	\N	2023-03-23	\N	t
-145	7	Прохоров Иван Павлович	1	2	\N	2023-05-31	\N	t
-146	8	Терехова Алиса Владимировна	1	2	\N	2022-10-27	\N	t
-147	8	Терехова Алиса Владимировна	1	2	\N	2022-12-22	\N	t
-148	8	Терехова Алиса Владимировна	1	2	\N	2023-03-23	\N	t
-149	8	Терехова Алиса Владимировна	1	2	\N	2023-05-31	\N	t
-150	9	Воробьева Виктория Максимовна	1	2	\N	2022-10-27	\N	t
-151	9	Воробьева Виктория Максимовна	1	2	\N	2022-12-22	\N	t
-152	9	Воробьева Виктория Максимовна	1	2	\N	2023-03-23	\N	t
-153	9	Воробьева Виктория Максимовна	1	2	\N	2023-05-31	\N	t
-154	1	Новикова Анастасия Павловна	1	3	\N	2022-09-30	\N	t
-155	1	Новикова Анастасия Павловна	1	3	\N	2022-10-31	\N	t
-156	1	Новикова Анастасия Павловна	1	3	\N	2022-11-30	\N	t
-157	1	Новикова Анастасия Павловна	1	3	\N	2022-12-31	\N	t
-158	1	Новикова Анастасия Павловна	1	3	\N	2023-01-31	\N	t
-159	1	Новикова Анастасия Павловна	1	3	\N	2023-02-28	\N	t
-160	1	Новикова Анастасия Павловна	1	3	\N	2023-03-31	\N	t
-161	1	Новикова Анастасия Павловна	1	3	\N	2023-04-30	\N	t
-162	1	Новикова Анастасия Павловна	1	3	\N	2023-05-31	\N	t
-163	2	Смирнов Александр Александрович	1	3	\N	2022-09-30	\N	t
-164	2	Смирнов Александр Александрович	1	3	\N	2022-10-31	\N	t
-165	2	Смирнов Александр Александрович	1	3	\N	2022-11-30	\N	t
-166	2	Смирнов Александр Александрович	1	3	\N	2022-12-31	\N	t
-167	2	Смирнов Александр Александрович	1	3	\N	2023-01-31	\N	t
-168	2	Смирнов Александр Александрович	1	3	\N	2023-02-28	\N	t
-169	2	Смирнов Александр Александрович	1	3	\N	2023-03-31	\N	t
-170	2	Смирнов Александр Александрович	1	3	\N	2023-04-30	\N	t
-171	2	Смирнов Александр Александрович	1	3	\N	2023-05-31	\N	t
-172	3	Федотова Евгения Сергеевна	1	3	\N	2022-09-30	\N	t
-173	3	Федотова Евгения Сергеевна	1	3	\N	2022-10-31	\N	t
-174	3	Федотова Евгения Сергеевна	1	3	\N	2022-11-30	\N	t
-175	3	Федотова Евгения Сергеевна	1	3	\N	2022-12-31	\N	t
-176	3	Федотова Евгения Сергеевна	1	3	\N	2023-01-31	\N	t
-177	3	Федотова Евгения Сергеевна	1	3	\N	2023-02-28	\N	t
-178	3	Федотова Евгения Сергеевна	1	3	\N	2023-03-31	\N	t
-179	3	Федотова Евгения Сергеевна	1	3	\N	2023-04-30	\N	t
-180	3	Федотова Евгения Сергеевна	1	3	\N	2023-05-31	\N	t
-181	4	Евсеева Татьяна Ивановна	1	3	\N	2022-09-30	\N	t
-182	4	Евсеева Татьяна Ивановна	1	3	\N	2022-10-31	\N	t
-183	4	Евсеева Татьяна Ивановна	1	3	\N	2022-11-30	\N	t
-184	4	Евсеева Татьяна Ивановна	1	3	\N	2022-12-31	\N	t
-185	4	Евсеева Татьяна Ивановна	1	3	\N	2023-01-31	\N	t
-186	4	Евсеева Татьяна Ивановна	1	3	\N	2023-02-28	\N	t
-187	4	Евсеева Татьяна Ивановна	1	3	\N	2023-03-31	\N	t
-188	4	Евсеева Татьяна Ивановна	1	3	\N	2023-04-30	\N	t
-189	4	Евсеева Татьяна Ивановна	1	3	\N	2023-05-31	\N	t
-190	5	Мещерякова Мария Владимировна	1	3	\N	2022-09-30	\N	t
-191	5	Мещерякова Мария Владимировна	1	3	\N	2022-10-31	\N	t
-192	5	Мещерякова Мария Владимировна	1	3	\N	2022-11-30	\N	t
-193	5	Мещерякова Мария Владимировна	1	3	\N	2022-12-31	\N	t
-194	5	Мещерякова Мария Владимировна	1	3	\N	2023-01-31	\N	t
-195	5	Мещерякова Мария Владимировна	1	3	\N	2023-02-28	\N	t
-196	5	Мещерякова Мария Владимировна	1	3	\N	2023-03-31	\N	t
-197	5	Мещерякова Мария Владимировна	1	3	\N	2023-04-30	\N	t
-198	5	Мещерякова Мария Владимировна	1	3	\N	2023-05-31	\N	t
-199	6	Герасимова Юлия Артемьевна	1	3	\N	2022-09-30	\N	t
-200	6	Герасимова Юлия Артемьевна	1	3	\N	2022-10-31	\N	t
-201	6	Герасимова Юлия Артемьевна	1	3	\N	2022-11-30	\N	t
-202	6	Герасимова Юлия Артемьевна	1	3	\N	2022-12-31	\N	t
-203	6	Герасимова Юлия Артемьевна	1	3	\N	2023-01-31	\N	t
-204	6	Герасимова Юлия Артемьевна	1	3	\N	2023-02-28	\N	t
-205	6	Герасимова Юлия Артемьевна	1	3	\N	2023-03-31	\N	t
-206	6	Герасимова Юлия Артемьевна	1	3	\N	2023-04-30	\N	t
-207	6	Герасимова Юлия Артемьевна	1	3	\N	2023-05-31	\N	t
-208	7	Прохоров Иван Павлович	1	3	\N	2022-09-30	\N	t
-209	7	Прохоров Иван Павлович	1	3	\N	2022-10-31	\N	t
-210	7	Прохоров Иван Павлович	1	3	\N	2022-11-30	\N	t
-211	7	Прохоров Иван Павлович	1	3	\N	2022-12-31	\N	t
-212	7	Прохоров Иван Павлович	1	3	\N	2023-01-31	\N	t
-213	7	Прохоров Иван Павлович	1	3	\N	2023-02-28	\N	t
-214	7	Прохоров Иван Павлович	1	3	\N	2023-03-31	\N	t
-215	7	Прохоров Иван Павлович	1	3	\N	2023-04-30	\N	t
-216	7	Прохоров Иван Павлович	1	3	\N	2023-05-31	\N	t
-217	8	Терехова Алиса Владимировна	1	3	\N	2022-09-30	\N	t
-218	8	Терехова Алиса Владимировна	1	3	\N	2022-10-31	\N	t
-219	8	Терехова Алиса Владимировна	1	3	\N	2022-11-30	\N	t
-220	8	Терехова Алиса Владимировна	1	3	\N	2022-12-31	\N	t
-221	8	Терехова Алиса Владимировна	1	3	\N	2023-01-31	\N	t
-222	8	Терехова Алиса Владимировна	1	3	\N	2023-02-28	\N	t
-223	8	Терехова Алиса Владимировна	1	3	\N	2023-03-31	\N	t
-224	8	Терехова Алиса Владимировна	1	3	\N	2023-04-30	\N	t
-225	8	Терехова Алиса Владимировна	1	3	\N	2023-05-31	\N	t
-226	9	Воробьева Виктория Максимовна	1	3	\N	2022-09-30	\N	t
-227	9	Воробьева Виктория Максимовна	1	3	\N	2022-10-31	\N	t
-228	9	Воробьева Виктория Максимовна	1	3	\N	2022-11-30	\N	t
-229	9	Воробьева Виктория Максимовна	1	3	\N	2022-12-31	\N	t
-230	9	Воробьева Виктория Максимовна	1	3	\N	2023-01-31	\N	t
-231	9	Воробьева Виктория Максимовна	1	3	\N	2023-02-28	\N	t
-232	9	Воробьева Виктория Максимовна	1	3	\N	2023-03-31	\N	t
-233	9	Воробьева Виктория Максимовна	1	3	\N	2023-04-30	\N	t
-234	9	Воробьева Виктория Максимовна	1	3	\N	2023-05-31	\N	t
-\.
-
-
---
--- TOC entry 3412 (class 0 OID 25744)
--- Dependencies: 231
--- Data for Name: temp3; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.temp3 (id, worker, "fullName", job, "jobTitle", "docType", doctypetitle, "linkToFile", "dateToPass", "dateOfPass", "isRelevant") FROM stdin;
-\.
-
-
---
--- TOC entry 3403 (class 0 OID 16432)
+-- TOC entry 3400 (class 0 OID 16432)
 -- Dependencies: 222
 -- Data for Name: workers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -1795,7 +1411,7 @@ COPY public.workers (id, "fullName", job, "isClassroomTeacher") FROM stdin;
 
 
 --
--- TOC entry 3418 (class 0 OID 0)
+-- TOC entry 3412 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: doc_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1804,7 +1420,7 @@ SELECT pg_catalog.setval('public.doc_types_id_seq', 19, true);
 
 
 --
--- TOC entry 3419 (class 0 OID 0)
+-- TOC entry 3413 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: fact_docs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1813,7 +1429,7 @@ SELECT pg_catalog.setval('public.fact_docs_id_seq', 234, true);
 
 
 --
--- TOC entry 3420 (class 0 OID 0)
+-- TOC entry 3414 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: jobs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1822,7 +1438,7 @@ SELECT pg_catalog.setval('public.jobs_id_seq', 11, true);
 
 
 --
--- TOC entry 3421 (class 0 OID 0)
+-- TOC entry 3415 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: periodicity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1831,7 +1447,7 @@ SELECT pg_catalog.setval('public.periodicity_id_seq', 7, true);
 
 
 --
--- TOC entry 3422 (class 0 OID 0)
+-- TOC entry 3416 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: schedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1840,7 +1456,7 @@ SELECT pg_catalog.setval('public.schedule_id_seq', 41, true);
 
 
 --
--- TOC entry 3423 (class 0 OID 0)
+-- TOC entry 3417 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: workers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1849,7 +1465,7 @@ SELECT pg_catalog.setval('public.workers_id_seq', 30, true);
 
 
 --
--- TOC entry 3233 (class 2606 OID 16428)
+-- TOC entry 3230 (class 2606 OID 16428)
 -- Name: doc_types doc_types_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1858,7 +1474,7 @@ ALTER TABLE ONLY public.doc_types
 
 
 --
--- TOC entry 3235 (class 2606 OID 16418)
+-- TOC entry 3232 (class 2606 OID 16418)
 -- Name: doc_types doc_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1867,7 +1483,7 @@ ALTER TABLE ONLY public.doc_types
 
 
 --
--- TOC entry 3247 (class 2606 OID 16479)
+-- TOC entry 3244 (class 2606 OID 16479)
 -- Name: fact_docs fact_docs_linkToFile_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1876,7 +1492,7 @@ ALTER TABLE ONLY public.fact_docs
 
 
 --
--- TOC entry 3249 (class 2606 OID 16477)
+-- TOC entry 3246 (class 2606 OID 16477)
 -- Name: fact_docs fact_docs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1885,7 +1501,7 @@ ALTER TABLE ONLY public.fact_docs
 
 
 --
--- TOC entry 3237 (class 2606 OID 16430)
+-- TOC entry 3234 (class 2606 OID 16430)
 -- Name: jobs jobs_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1894,7 +1510,7 @@ ALTER TABLE ONLY public.jobs
 
 
 --
--- TOC entry 3239 (class 2606 OID 16425)
+-- TOC entry 3236 (class 2606 OID 16425)
 -- Name: jobs jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1903,7 +1519,7 @@ ALTER TABLE ONLY public.jobs
 
 
 --
--- TOC entry 3251 (class 2606 OID 25413)
+-- TOC entry 3248 (class 2606 OID 25413)
 -- Name: periodicity periodicity_dates_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1912,7 +1528,7 @@ ALTER TABLE ONLY public.periodicity
 
 
 --
--- TOC entry 3253 (class 2606 OID 16573)
+-- TOC entry 3250 (class 2606 OID 16573)
 -- Name: periodicity periodicity_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1921,7 +1537,7 @@ ALTER TABLE ONLY public.periodicity
 
 
 --
--- TOC entry 3255 (class 2606 OID 16575)
+-- TOC entry 3252 (class 2606 OID 16575)
 -- Name: periodicity periodicity_title_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1930,7 +1546,7 @@ ALTER TABLE ONLY public.periodicity
 
 
 --
--- TOC entry 3243 (class 2606 OID 16544)
+-- TOC entry 3240 (class 2606 OID 16544)
 -- Name: schedule schedule_docType_jobOfResponsible_dateToPass_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1939,7 +1555,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3245 (class 2606 OID 16449)
+-- TOC entry 3242 (class 2606 OID 16449)
 -- Name: schedule schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1948,7 +1564,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3241 (class 2606 OID 16438)
+-- TOC entry 3238 (class 2606 OID 16438)
 -- Name: workers workers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1957,7 +1573,7 @@ ALTER TABLE ONLY public.workers
 
 
 --
--- TOC entry 3257 (class 2606 OID 16460)
+-- TOC entry 3254 (class 2606 OID 16460)
 -- Name: schedule schedule_docType_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1966,7 +1582,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3258 (class 2606 OID 16465)
+-- TOC entry 3255 (class 2606 OID 16465)
 -- Name: schedule schedule_jobOfResponsible_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1975,7 +1591,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3256 (class 2606 OID 16439)
+-- TOC entry 3253 (class 2606 OID 16439)
 -- Name: workers workers_job_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1983,7 +1599,7 @@ ALTER TABLE ONLY public.workers
     ADD CONSTRAINT workers_job_fkey FOREIGN KEY (job) REFERENCES public.jobs(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
--- Completed on 2022-10-25 22:22:36
+-- Completed on 2022-10-25 22:27:20
 
 --
 -- PostgreSQL database dump complete
