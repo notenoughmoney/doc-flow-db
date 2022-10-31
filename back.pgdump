@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.4
--- Dumped by pg_dump version 14.4
+-- Dumped from database version 15.0
+-- Dumped by pg_dump version 15.0
 
--- Started on 2022-10-25 22:27:20
+-- Started on 2022-10-31 10:38:37
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,7 +19,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 235 (class 1255 OID 16511)
+-- TOC entry 226 (class 1255 OID 16401)
 -- Name: add_doc_type(text, text); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -46,7 +46,7 @@ $$;
 ALTER PROCEDURE public.add_doc_type(IN _title text, IN _linktoshablon text) OWNER TO postgres;
 
 --
--- TOC entry 245 (class 1255 OID 16512)
+-- TOC entry 227 (class 1255 OID 16402)
 -- Name: add_job(text); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -73,7 +73,7 @@ $$;
 ALTER PROCEDURE public.add_job(IN _title text) OWNER TO postgres;
 
 --
--- TOC entry 253 (class 1255 OID 16577)
+-- TOC entry 244 (class 1255 OID 16403)
 -- Name: add_periodicity(text, text[]); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -116,7 +116,7 @@ $$;
 ALTER PROCEDURE public.add_periodicity(IN _title text, IN _dates text[]) OWNER TO postgres;
 
 --
--- TOC entry 258 (class 1255 OID 25165)
+-- TOC entry 245 (class 1255 OID 16404)
 -- Name: add_schedule(integer, integer, integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -214,11 +214,11 @@ $$;
 ALTER PROCEDURE public.add_schedule(IN _doctype integer, IN _jobofresponsible integer, IN _period integer) OWNER TO postgres;
 
 --
--- TOC entry 244 (class 1255 OID 16516)
--- Name: add_worker(text, integer, boolean); Type: PROCEDURE; Schema: public; Owner: postgres
+-- TOC entry 251 (class 1255 OID 16500)
+-- Name: add_worker(text, integer, text, text, text); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
-CREATE PROCEDURE public.add_worker(IN _fullname text, IN _job integer, IN _isclassroomteacher boolean)
+CREATE PROCEDURE public.add_worker(IN _fullname text, IN _job integer, IN _isclassroomteacher text, IN _mail text, IN _password text)
     LANGUAGE plpgsql
     AS $$
 declare
@@ -232,16 +232,16 @@ begin
 	if exist = 0 then
 		raise exception 'Такой должности не существует';
 	else
-		insert into workers ("fullName", job, "isClassroomTeacher") values (_fullName, _job, _isClassroomTeacher);
+		insert into workers ("fullName", job, "isClassroomTeacher", mail, "password") values (_fullName, _job, _isClassroomTeacher, _mail, _password);
 	end if;
 end;
 $$;
 
 
-ALTER PROCEDURE public.add_worker(IN _fullname text, IN _job integer, IN _isclassroomteacher boolean) OWNER TO postgres;
+ALTER PROCEDURE public.add_worker(IN _fullname text, IN _job integer, IN _isclassroomteacher text, IN _mail text, IN _password text) OWNER TO postgres;
 
 --
--- TOC entry 262 (class 1255 OID 25427)
+-- TOC entry 246 (class 1255 OID 16406)
 -- Name: del_doc_type(integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -269,7 +269,7 @@ $$;
 ALTER PROCEDURE public.del_doc_type(IN _id integer) OWNER TO postgres;
 
 --
--- TOC entry 247 (class 1255 OID 25433)
+-- TOC entry 228 (class 1255 OID 16407)
 -- Name: del_job(integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -297,7 +297,7 @@ $$;
 ALTER PROCEDURE public.del_job(IN _id integer) OWNER TO postgres;
 
 --
--- TOC entry 248 (class 1255 OID 25435)
+-- TOC entry 229 (class 1255 OID 16408)
 -- Name: del_periodicity(integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -325,7 +325,7 @@ $$;
 ALTER PROCEDURE public.del_periodicity(IN _id integer) OWNER TO postgres;
 
 --
--- TOC entry 251 (class 1255 OID 25472)
+-- TOC entry 230 (class 1255 OID 16409)
 -- Name: del_schedule(integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -362,7 +362,7 @@ $$;
 ALTER PROCEDURE public.del_schedule(IN _id integer) OWNER TO postgres;
 
 --
--- TOC entry 249 (class 1255 OID 25439)
+-- TOC entry 231 (class 1255 OID 16410)
 -- Name: del_worker(integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -390,7 +390,7 @@ $$;
 ALTER PROCEDURE public.del_worker(IN _id integer) OWNER TO postgres;
 
 --
--- TOC entry 254 (class 1255 OID 25482)
+-- TOC entry 232 (class 1255 OID 16411)
 -- Name: get_doc_types(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -408,7 +408,7 @@ $$;
 ALTER FUNCTION public.get_doc_types() OWNER TO postgres;
 
 --
--- TOC entry 264 (class 1255 OID 25667)
+-- TOC entry 247 (class 1255 OID 16412)
 -- Name: get_fact_docs(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -467,7 +467,7 @@ $$;
 ALTER FUNCTION public.get_fact_docs() OWNER TO postgres;
 
 --
--- TOC entry 265 (class 1255 OID 25753)
+-- TOC entry 248 (class 1255 OID 16413)
 -- Name: get_fact_docs_by_worker(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -539,7 +539,7 @@ $$;
 ALTER FUNCTION public.get_fact_docs_by_worker(workerid integer) OWNER TO postgres;
 
 --
--- TOC entry 255 (class 1255 OID 25483)
+-- TOC entry 249 (class 1255 OID 16414)
 -- Name: get_jobs(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -557,7 +557,7 @@ $$;
 ALTER FUNCTION public.get_jobs() OWNER TO postgres;
 
 --
--- TOC entry 256 (class 1255 OID 25484)
+-- TOC entry 250 (class 1255 OID 16415)
 -- Name: get_periodicities(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -575,7 +575,7 @@ $$;
 ALTER FUNCTION public.get_periodicities() OWNER TO postgres;
 
 --
--- TOC entry 252 (class 1255 OID 25542)
+-- TOC entry 253 (class 1255 OID 16416)
 -- Name: get_schedule(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -606,7 +606,7 @@ $$;
 ALTER FUNCTION public.get_schedule() OWNER TO postgres;
 
 --
--- TOC entry 250 (class 1255 OID 25491)
+-- TOC entry 256 (class 1255 OID 16417)
 -- Name: get_workers(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -620,7 +620,9 @@ begin
 			workers."fullName", 
 			workers."job" as "jobId", 
 			jobs."title", 
-			workers."isClassroomTeacher"
+			workers."isClassroomTeacher",
+			workers."mail",
+			workers."password"
 		from workers
 		join jobs
 		on workers."job" = jobs."id";
@@ -631,7 +633,7 @@ $$;
 ALTER FUNCTION public.get_workers() OWNER TO postgres;
 
 --
--- TOC entry 257 (class 1255 OID 24924)
+-- TOC entry 254 (class 1255 OID 16418)
 -- Name: get_year(date); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -678,7 +680,7 @@ $$;
 ALTER FUNCTION public.get_year(null_date date) OWNER TO postgres;
 
 --
--- TOC entry 259 (class 1255 OID 25402)
+-- TOC entry 255 (class 1255 OID 16419)
 -- Name: update_doc_type(integer, text, text); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -717,7 +719,7 @@ $$;
 ALTER PROCEDURE public.update_doc_type(IN _id integer, IN _title text, IN _linktoshablon text) OWNER TO postgres;
 
 --
--- TOC entry 260 (class 1255 OID 25409)
+-- TOC entry 257 (class 1255 OID 16420)
 -- Name: update_job(integer, text); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -755,7 +757,7 @@ $$;
 ALTER PROCEDURE public.update_job(IN _id integer, IN _title text) OWNER TO postgres;
 
 --
--- TOC entry 261 (class 1255 OID 25417)
+-- TOC entry 258 (class 1255 OID 16421)
 -- Name: update_periodicity(integer, text, text[]); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -807,7 +809,7 @@ $$;
 ALTER PROCEDURE public.update_periodicity(IN _id integer, IN _title text, IN _dates text[]) OWNER TO postgres;
 
 --
--- TOC entry 263 (class 1255 OID 25419)
+-- TOC entry 259 (class 1255 OID 16422)
 -- Name: update_schedule(integer, integer, integer, integer); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -924,11 +926,11 @@ $$;
 ALTER PROCEDURE public.update_schedule(IN _id integer, IN _doctype integer, IN _jobofresponsible integer, IN _period integer) OWNER TO postgres;
 
 --
--- TOC entry 246 (class 1255 OID 25411)
--- Name: update_worker(integer, text, integer, boolean); Type: PROCEDURE; Schema: public; Owner: postgres
+-- TOC entry 252 (class 1255 OID 16501)
+-- Name: update_worker(integer, text, integer, text, text, text); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
-CREATE PROCEDURE public.update_worker(IN _id integer, IN _fullname text, IN _job integer, IN _isclassroomteacher boolean)
+CREATE PROCEDURE public.update_worker(IN _id integer, IN _fullname text, IN _job integer, IN _isclassroomteacher text, IN _mail text, IN _password text)
     LANGUAGE plpgsql
     AS $$
 declare
@@ -946,21 +948,23 @@ begin
 		set
 			"fullName" = _fullname,
 			"job" = _job,
-			"isClassroomTeacher" = _isclassroomteacher
+			"isClassroomTeacher" = _isclassroomteacher,
+			"mail" = _mail,
+			"password" = _password
 		where id = _id;
 	end if;
 end;
 $$;
 
 
-ALTER PROCEDURE public.update_worker(IN _id integer, IN _fullname text, IN _job integer, IN _isclassroomteacher boolean) OWNER TO postgres;
+ALTER PROCEDURE public.update_worker(IN _id integer, IN _fullname text, IN _job integer, IN _isclassroomteacher text, IN _mail text, IN _password text) OWNER TO postgres;
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- TOC entry 218 (class 1259 OID 16412)
+-- TOC entry 214 (class 1259 OID 16424)
 -- Name: doc_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -974,7 +978,7 @@ CREATE TABLE public.doc_types (
 ALTER TABLE public.doc_types OWNER TO postgres;
 
 --
--- TOC entry 217 (class 1259 OID 16411)
+-- TOC entry 215 (class 1259 OID 16429)
 -- Name: doc_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -989,7 +993,7 @@ ALTER TABLE public.doc_types ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 226 (class 1259 OID 16471)
+-- TOC entry 216 (class 1259 OID 16430)
 -- Name: fact_docs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1007,7 +1011,7 @@ CREATE TABLE public.fact_docs (
 ALTER TABLE public.fact_docs OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 16470)
+-- TOC entry 217 (class 1259 OID 16435)
 -- Name: fact_docs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1022,7 +1026,7 @@ ALTER TABLE public.fact_docs ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 219 (class 1259 OID 16419)
+-- TOC entry 218 (class 1259 OID 16436)
 -- Name: jobs; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1035,7 +1039,7 @@ CREATE TABLE public.jobs (
 ALTER TABLE public.jobs OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 16426)
+-- TOC entry 219 (class 1259 OID 16441)
 -- Name: jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1050,7 +1054,7 @@ ALTER TABLE public.jobs ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 228 (class 1259 OID 16567)
+-- TOC entry 220 (class 1259 OID 16442)
 -- Name: periodicity; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1064,7 +1068,7 @@ CREATE TABLE public.periodicity (
 ALTER TABLE public.periodicity OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 16566)
+-- TOC entry 221 (class 1259 OID 16447)
 -- Name: periodicity_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1079,7 +1083,7 @@ ALTER TABLE public.periodicity ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY 
 
 
 --
--- TOC entry 224 (class 1259 OID 16445)
+-- TOC entry 222 (class 1259 OID 16448)
 -- Name: schedule; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1094,7 +1098,7 @@ CREATE TABLE public.schedule (
 ALTER TABLE public.schedule OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 16444)
+-- TOC entry 223 (class 1259 OID 16451)
 -- Name: schedule_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1109,7 +1113,7 @@ ALTER TABLE public.schedule ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 222 (class 1259 OID 16432)
+-- TOC entry 224 (class 1259 OID 16452)
 -- Name: workers; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -1117,14 +1121,16 @@ CREATE TABLE public.workers (
     id integer NOT NULL,
     "fullName" text,
     job integer,
-    "isClassroomTeacher" boolean NOT NULL
+    "isClassroomTeacher" boolean NOT NULL,
+    mail text NOT NULL,
+    password text DEFAULT 123 NOT NULL
 );
 
 
 ALTER TABLE public.workers OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 16431)
+-- TOC entry 225 (class 1259 OID 16457)
 -- Name: workers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -1139,8 +1145,8 @@ ALTER TABLE public.workers ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 3396 (class 0 OID 16412)
--- Dependencies: 218
+-- TOC entry 3393 (class 0 OID 16424)
+-- Dependencies: 214
 -- Data for Name: doc_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1165,8 +1171,8 @@ COPY public.doc_types (id, title, "linkToShablon") FROM stdin;
 
 
 --
--- TOC entry 3404 (class 0 OID 16471)
--- Dependencies: 226
+-- TOC entry 3395 (class 0 OID 16430)
+-- Dependencies: 216
 -- Data for Name: fact_docs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1328,8 +1334,8 @@ COPY public.fact_docs (id, worker, reason, "linkToFile", "dateToPass", "dateOfPa
 
 
 --
--- TOC entry 3397 (class 0 OID 16419)
--- Dependencies: 219
+-- TOC entry 3397 (class 0 OID 16436)
+-- Dependencies: 218
 -- Data for Name: jobs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1347,8 +1353,8 @@ COPY public.jobs (id, title) FROM stdin;
 
 
 --
--- TOC entry 3406 (class 0 OID 16567)
--- Dependencies: 228
+-- TOC entry 3399 (class 0 OID 16442)
+-- Dependencies: 220
 -- Data for Name: periodicity; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1363,8 +1369,8 @@ COPY public.periodicity (id, title, dates) FROM stdin;
 
 
 --
--- TOC entry 3402 (class 0 OID 16445)
--- Dependencies: 224
+-- TOC entry 3401 (class 0 OID 16448)
+-- Dependencies: 222
 -- Data for Name: schedule; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1376,43 +1382,43 @@ COPY public.schedule (id, "docType", "jobOfResponsible", period) FROM stdin;
 
 
 --
--- TOC entry 3400 (class 0 OID 16432)
--- Dependencies: 222
+-- TOC entry 3403 (class 0 OID 16452)
+-- Dependencies: 224
 -- Data for Name: workers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.workers (id, "fullName", job, "isClassroomTeacher") FROM stdin;
-1	Новикова Анастасия Павловна	1	f
-2	Смирнов Александр Александрович	1	t
-3	Федотова Евгения Сергеевна	1	t
-4	Евсеева Татьяна Ивановна	1	t
-5	Мещерякова Мария Владимировна	1	f
-6	Герасимова Юлия Артемьевна	1	t
-7	Прохоров Иван Павлович	1	f
-8	Терехова Алиса Владимировна	1	t
-9	Воробьева Виктория Максимовна	1	t
-10	Воробьев Степан Михайлович	2	t
-11	Кузьмина Юлия Сергеевна	2	t
-12	Гуляев Тимур Алексеевич	2	f
-13	Степанова Анна Кирилловна	2	t
-14	Давыдова Ева Викторовна	2	t
-15	Касаткина Анна Константиновна	2	f
-16	Исаева Вера Михайловна	2	t
-17	Нестерова Екатерина Сергеевна	2	t
-18	Кулешова Елизавета Алексеевна	2	t
-19	Семенова Вероника Артёмовна	3	f
-20	Павлова Полина Кирилловна	4	f
-21	Добрынин Дмитрий Дмитриевич	5	f
-22	Березина Анастасия Арсентьевна	6	f
-23	Алексеева Марина Григорьевна	7	f
-24	Карташова Софья Петровна	8	f
-25	Никитин Кирилл Николаевич	9	f
+COPY public.workers (id, "fullName", job, "isClassroomTeacher", mail, password) FROM stdin;
+1	Новикова Анастасия Павловна	1	f	a.novikova@mail.ru	123
+2	Смирнов Александр Александрович	1	t	a.smirnov@mail.ru	123
+3	Федотова Евгения Сергеевна	1	t	e.fedotova@mail.ru	123
+4	Евсеева Татьяна Ивановна	1	t	t.evseeva@mail.ru	123
+5	Мещерякова Мария Владимировна	1	f	m.mescheryakova@mail.ru	123
+6	Герасимова Юлия Артемьевна	1	t	j.gerasimova@mail.ru	123
+7	Прохоров Иван Павлович	1	f	i.prokhorov@mail.ru	123
+8	Терехова Алиса Владимировна	1	t	a.terekhova@mail.ru	123
+9	Воробьева Виктория Максимовна	1	t	v.vorobiova@mail.ru	123
+10	Воробьев Степан Михайлович	2	t	s.vorobiov@mail.ru	123
+11	Кузьмина Юлия Сергеевна	2	t	j.kuzmina@mail.ru	123
+12	Гуляев Тимур Алексеевич	2	f	t.gulyaev@mail.ru	123
+13	Степанова Анна Кирилловна	2	t	a.stepanova@mail.ru	123
+14	Давыдова Ева Викторовна	2	t	e.davydova@mail.ru	123
+15	Касаткина Анна Константиновна	2	f	a.kasatkina@mail.ru	123
+16	Исаева Вера Михайловна	2	t	v.isaeva@mail.ru	123
+17	Нестерова Екатерина Сергеевна	2	t	e.nesterova@mail.ru	123
+18	Кулешова Елизавета Алексеевна	2	t	e.kuleshova@mail.ru	123
+19	Семенова Вероника Артёмовна	3	f	v.semyonova@mail.ru	123
+20	Павлова Полина Кирилловна	4	f	p.pavlova@mail.ru	123
+21	Добрынин Дмитрий Дмитриевич	5	f	d.dobrynin@mail.ru	123
+22	Березина Анастасия Арсентьевна	6	f	a.berezina@mail.ru	123
+23	Алексеева Марина Григорьевна	7	f	m.alekseeva@mail.ru	123
+24	Карташова Софья Петровна	8	f	s.kartashova@mail.ru	123
+25	Никитин Кирилл Николаевич	9	f	k.nikitin@mail.ru	123
 \.
 
 
 --
--- TOC entry 3412 (class 0 OID 0)
--- Dependencies: 217
+-- TOC entry 3410 (class 0 OID 0)
+-- Dependencies: 215
 -- Name: doc_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1420,8 +1426,8 @@ SELECT pg_catalog.setval('public.doc_types_id_seq', 19, true);
 
 
 --
--- TOC entry 3413 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 3411 (class 0 OID 0)
+-- Dependencies: 217
 -- Name: fact_docs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1429,8 +1435,8 @@ SELECT pg_catalog.setval('public.fact_docs_id_seq', 234, true);
 
 
 --
--- TOC entry 3414 (class 0 OID 0)
--- Dependencies: 220
+-- TOC entry 3412 (class 0 OID 0)
+-- Dependencies: 219
 -- Name: jobs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1438,8 +1444,8 @@ SELECT pg_catalog.setval('public.jobs_id_seq', 11, true);
 
 
 --
--- TOC entry 3415 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 3413 (class 0 OID 0)
+-- Dependencies: 221
 -- Name: periodicity_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1447,7 +1453,7 @@ SELECT pg_catalog.setval('public.periodicity_id_seq', 7, true);
 
 
 --
--- TOC entry 3416 (class 0 OID 0)
+-- TOC entry 3414 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: schedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -1456,8 +1462,8 @@ SELECT pg_catalog.setval('public.schedule_id_seq', 41, true);
 
 
 --
--- TOC entry 3417 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 3415 (class 0 OID 0)
+-- Dependencies: 225
 -- Name: workers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1465,7 +1471,7 @@ SELECT pg_catalog.setval('public.workers_id_seq', 30, true);
 
 
 --
--- TOC entry 3230 (class 2606 OID 16428)
+-- TOC entry 3223 (class 2606 OID 16459)
 -- Name: doc_types doc_types_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1474,7 +1480,7 @@ ALTER TABLE ONLY public.doc_types
 
 
 --
--- TOC entry 3232 (class 2606 OID 16418)
+-- TOC entry 3225 (class 2606 OID 16461)
 -- Name: doc_types doc_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1483,7 +1489,7 @@ ALTER TABLE ONLY public.doc_types
 
 
 --
--- TOC entry 3244 (class 2606 OID 16479)
+-- TOC entry 3227 (class 2606 OID 16463)
 -- Name: fact_docs fact_docs_linkToFile_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1492,7 +1498,7 @@ ALTER TABLE ONLY public.fact_docs
 
 
 --
--- TOC entry 3246 (class 2606 OID 16477)
+-- TOC entry 3229 (class 2606 OID 16465)
 -- Name: fact_docs fact_docs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1501,7 +1507,7 @@ ALTER TABLE ONLY public.fact_docs
 
 
 --
--- TOC entry 3234 (class 2606 OID 16430)
+-- TOC entry 3231 (class 2606 OID 16467)
 -- Name: jobs jobs_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1510,7 +1516,7 @@ ALTER TABLE ONLY public.jobs
 
 
 --
--- TOC entry 3236 (class 2606 OID 16425)
+-- TOC entry 3233 (class 2606 OID 16469)
 -- Name: jobs jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1519,7 +1525,7 @@ ALTER TABLE ONLY public.jobs
 
 
 --
--- TOC entry 3248 (class 2606 OID 25413)
+-- TOC entry 3235 (class 2606 OID 16471)
 -- Name: periodicity periodicity_dates_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1528,7 +1534,7 @@ ALTER TABLE ONLY public.periodicity
 
 
 --
--- TOC entry 3250 (class 2606 OID 16573)
+-- TOC entry 3237 (class 2606 OID 16473)
 -- Name: periodicity periodicity_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1537,7 +1543,7 @@ ALTER TABLE ONLY public.periodicity
 
 
 --
--- TOC entry 3252 (class 2606 OID 16575)
+-- TOC entry 3239 (class 2606 OID 16475)
 -- Name: periodicity periodicity_title_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1546,7 +1552,7 @@ ALTER TABLE ONLY public.periodicity
 
 
 --
--- TOC entry 3240 (class 2606 OID 16544)
+-- TOC entry 3241 (class 2606 OID 16477)
 -- Name: schedule schedule_docType_jobOfResponsible_dateToPass_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1555,7 +1561,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3242 (class 2606 OID 16449)
+-- TOC entry 3243 (class 2606 OID 16479)
 -- Name: schedule schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1564,7 +1570,16 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3238 (class 2606 OID 16438)
+-- TOC entry 3245 (class 2606 OID 16498)
+-- Name: workers workers_mail_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.workers
+    ADD CONSTRAINT workers_mail_key UNIQUE (mail);
+
+
+--
+-- TOC entry 3247 (class 2606 OID 16481)
 -- Name: workers workers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1573,7 +1588,7 @@ ALTER TABLE ONLY public.workers
 
 
 --
--- TOC entry 3254 (class 2606 OID 16460)
+-- TOC entry 3248 (class 2606 OID 16482)
 -- Name: schedule schedule_docType_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1582,7 +1597,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3255 (class 2606 OID 16465)
+-- TOC entry 3249 (class 2606 OID 16487)
 -- Name: schedule schedule_jobOfResponsible_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1591,7 +1606,7 @@ ALTER TABLE ONLY public.schedule
 
 
 --
--- TOC entry 3253 (class 2606 OID 16439)
+-- TOC entry 3250 (class 2606 OID 16492)
 -- Name: workers workers_job_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1599,7 +1614,7 @@ ALTER TABLE ONLY public.workers
     ADD CONSTRAINT workers_job_fkey FOREIGN KEY (job) REFERENCES public.jobs(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
--- Completed on 2022-10-25 22:27:20
+-- Completed on 2022-10-31 10:38:37
 
 --
 -- PostgreSQL database dump complete
